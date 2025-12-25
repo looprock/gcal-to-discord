@@ -4,7 +4,7 @@ import argparse
 import asyncio
 import signal
 import sys
-from typing import Any, Optional
+from typing import Any
 
 import structlog
 
@@ -40,8 +40,8 @@ class CalendarSyncService:
         """Initialize the sync service."""
         self.settings = load_settings()
         self.logger = structlog.get_logger()
-        self.gcal_client: Optional[GoogleCalendarClient] = None
-        self.discord_client: Optional[DiscordClient] = None
+        self.gcal_client: GoogleCalendarClient | None = None
+        self.discord_client: DiscordClient | None = None
         self.running = False
         self._shutdown_event = asyncio.Event()
 
@@ -127,7 +127,7 @@ class CalendarSyncService:
                 )
                 # If we get here, shutdown was signaled
                 break
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 # Timeout is normal, continue to next sync
                 continue
 

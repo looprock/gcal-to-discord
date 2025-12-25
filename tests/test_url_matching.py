@@ -1,6 +1,6 @@
 """Tests for URL matching to prevent duplicate messages."""
 
-from unittest.mock import AsyncMock, MagicMock, Mock
+from unittest.mock import AsyncMock, Mock
 
 import pytest
 

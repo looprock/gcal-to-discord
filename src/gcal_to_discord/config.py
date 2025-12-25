@@ -1,7 +1,6 @@
 """Configuration management for Google Calendar to Discord sync."""
 
 from pathlib import Path
-from typing import Optional
 
 from pydantic import Field, validator
 from pydantic_settings import BaseSettings, SettingsConfigDict

@@ -1,7 +1,7 @@
 """Discord integration module."""
 
 import asyncio
-from typing import Any, Optional
+from typing import Any
 
 import discord
 import structlog
@@ -34,7 +34,7 @@ class DiscordClient:
         intents.message_content = True
 
         self.client = discord.Client(intents=intents)
-        self.channel: Optional[discord.TextChannel] = None
+        self.channel: discord.TextChannel | None = None
         self.event_message_map: dict[str, int] = {}  # event_id -> message_id
         self._url_to_message_map: dict[str, int] = {}  # event_url -> message_id
 
@@ -99,7 +99,7 @@ class DiscordClient:
         """Wait until the Discord client is ready."""
         try:
             await asyncio.wait_for(self.client.wait_until_ready(), timeout=timeout)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             self.logger.error("discord_ready_timeout", timeout=timeout)
             raise
 
@@ -175,7 +175,7 @@ class DiscordClient:
                 error=str(e),
             )
 
-    async def upsert_event(self, event: GoogleCalendarEvent) -> Optional[int]:
+    async def upsert_event(self, event: GoogleCalendarEvent) -> int | None:
         """
         Post a calendar event to Discord, or skip if it already exists.
 

@@ -10,7 +10,7 @@ A lightweight Python application that synchronizes Google Calendar events to Dis
 - ⚡ Lightweight: ~64MB memory, minimal CPU
 - 🔐 Secure OAuth2 authentication
 - 📊 Structured logging with detailed operation tracking
-- 🐍 Modern Python (3.11+) with UV package manager
+- 🐍 Modern Python (3.14+) with UV package manager
 - ⏰ Designed for scheduled execution (cron, systemd, K8s CronJob)
 
 ## Quick Start
@@ -34,7 +34,7 @@ uv run gcal-to-discord --once
 
 ## Prerequisites
 
-- Python 3.11+
+- Python 3.14+
 - [UV package manager](https://github.com/astral-sh/uv)
 - Google Cloud project with Calendar API enabled
 - Discord bot with message permissions

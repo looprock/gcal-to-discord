@@ -1,9 +1,7 @@
 """Google Calendar integration module."""
 
-import json
 from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import structlog
 from google.auth.transport.requests import Request
@@ -24,19 +22,19 @@ class GoogleCalendarEvent:
         """Initialize event from Google Calendar API response."""
         self.id: str = event_data.get("id", "")
         self.summary: str = event_data.get("summary", "No Title")
-        self.description: Optional[str] = event_data.get("description")
-        self.location: Optional[str] = event_data.get("location")
+        self.description: str | None = event_data.get("description")
+        self.location: str | None = event_data.get("location")
         self.html_link: str = event_data.get("htmlLink", "")
 
         # Parse start time
         start = event_data.get("start", {})
-        self.start_time: Optional[datetime] = self._parse_datetime(
+        self.start_time: datetime | None = self._parse_datetime(
             start.get("dateTime") or start.get("date")
         )
 
         # Parse end time
         end = event_data.get("end", {})
-        self.end_time: Optional[datetime] = self._parse_datetime(
+        self.end_time: datetime | None = self._parse_datetime(
             end.get("dateTime") or end.get("date")
         )
 
@@ -48,7 +46,7 @@ class GoogleCalendarEvent:
         ]
 
     @staticmethod
-    def _parse_datetime(dt_string: Optional[str]) -> Optional[datetime]:
+    def _parse_datetime(dt_string: str | None) -> datetime | None:
         """Parse datetime string from Google Calendar API."""
         if not dt_string:
             return None
@@ -136,8 +134,8 @@ class GoogleCalendarClient:
     def __init__(self, settings: Settings) -> None:
         """Initialize Google Calendar client."""
         self.settings = settings
-        self.credentials: Optional[Credentials] = None
-        self.service: Optional[Any] = None
+        self.credentials: Credentials | None = None
+        self.service: Any | None = None
         self.logger = logger.bind(component="google_calendar")
 
     def authenticate(self) -> None:
