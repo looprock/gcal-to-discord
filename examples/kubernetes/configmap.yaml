@@ -8,6 +8,7 @@ metadata:
 data:
   # Discord Configuration
   DISCORD_CHANNEL_ID: "YOUR_DISCORD_CHANNEL_ID"
+  # MESSAGE_PREFIX: "[Name] is thinking of attending:"
 
   # Google Calendar Configuration
   GOOGLE_CALENDAR_ID: "primary"

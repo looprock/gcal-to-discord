@@ -219,3 +219,4 @@ token.json
 
 # Kubernetes secrets (should never be committed with real values)
 examples/kubernetes/secrets.yaml
+credentials.json

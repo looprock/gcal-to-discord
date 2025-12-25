@@ -95,7 +95,7 @@ class CalendarSyncService:
                 "sync_completed",
                 total_events=stats["total"],
                 created=stats["created"],
-                updated=stats["updated"],
+                skipped=stats["skipped"],
                 failed=stats["failed"],
             )
 
@@ -145,15 +145,21 @@ class CalendarSyncService:
 
             # Start Discord client in background
             if self.discord_client:
-                # Create Discord connection task
+                # Start Discord connection in background
                 discord_task = asyncio.create_task(self.discord_client.connect())
 
-                # Wait for Discord to be ready
-                await self.discord_client.wait_until_ready()
+                # Wait until Discord is connected and channel is ready
+                await self.discord_client.wait_until_ready(timeout=30)
 
                 if run_once:
                     # Run a single sync and exit
                     await self.sync_once()
+                    # Cancel the Discord task since we're done
+                    discord_task.cancel()
+                    try:
+                        await discord_task
+                    except asyncio.CancelledError:
+                        pass
                 else:
                     # Start continuous sync loop
                     sync_task = asyncio.create_task(self.run_sync_loop())
@@ -202,12 +208,12 @@ async def async_main(run_once: bool = False) -> int:
         run_once: If True, run a single sync and exit. If False, run continuous loop.
     """
     service = CalendarSyncService()
+    configure_logging(service.settings.log_level)
+    logger = structlog.get_logger()
 
     try:
-        configure_logging(service.settings.log_level)
         service.setup_signal_handlers()
 
-        logger = structlog.get_logger()
         logger.info(
             "starting_gcal_to_discord_sync",
             version="0.1.0",

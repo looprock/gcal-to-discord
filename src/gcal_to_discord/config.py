@@ -43,6 +43,10 @@ class Settings(BaseSettings):
         ...,
         description="Discord channel ID to post events",
     )
+    message_prefix: str | None = Field(
+        default=None,
+        description="Optional prefix text to include before event embeds (e.g., '[Name] is thinking of attending:')",
+    )
 
     # Sync Settings
     sync_interval_minutes: int = Field(

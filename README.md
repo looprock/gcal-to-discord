@@ -76,6 +76,7 @@ LOG_LEVEL=INFO
 |----------|-------------|---------|
 | `DISCORD_BOT_TOKEN` | Discord bot authentication token | *required* |
 | `DISCORD_CHANNEL_ID` | Discord channel ID for event messages | *required* |
+| `MESSAGE_PREFIX` | Optional text to include before event embeds | None |
 | `GOOGLE_CREDENTIALS_FILE` | Path to OAuth2 credentials | `credentials.json` |
 | `GOOGLE_TOKEN_FILE` | Path to store OAuth2 token | `token.json` |
 | `GOOGLE_CALENDAR_ID` | Calendar ID ("primary" for main calendar) | `primary` |

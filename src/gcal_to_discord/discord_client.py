@@ -29,14 +29,16 @@ class DiscordClient:
         self.settings = settings
         self.logger = logger.bind(component="discord_client")
 
-        # Configure intents
+        # Configure intents - we only need default intents to post messages
+        # We don't need message_content since we're only posting, not reading content
         intents = discord.Intents.default()
-        intents.message_content = True
 
         self.client = discord.Client(intents=intents)
         self.channel: discord.TextChannel | None = None
         self.event_message_map: dict[str, int] = {}  # event_id -> message_id
         self._url_to_message_map: dict[str, int] = {}  # event_url -> message_id
+        self._channel_ready = asyncio.Event()  # Signal when channel is ready
+        self._connect_started = asyncio.Event()  # Signal when connection has started
 
         # Set up event handlers
         self._setup_event_handlers()
@@ -59,6 +61,7 @@ class DiscordClient:
                 channel = self.client.get_channel(self.settings.discord_channel_id)
                 if channel and isinstance(channel, discord.TextChannel):
                     self.channel = channel
+                    self._channel_ready.set()  # Signal that channel is ready
                     self.logger.info(
                         "connected_to_channel",
                         channel_name=channel.name,
@@ -78,10 +81,10 @@ class DiscordClient:
             self.logger.error("discord_client_error", event=event, args=args, kwargs=kwargs)
 
     async def connect(self) -> None:
-        """Connect to Discord."""
+        """Connect to Discord and wait until ready."""
         try:
-            await self.client.login(self.settings.discord_bot_token)
-            await self.client.connect()
+            self._connect_started.set()  # Signal that connection has started
+            await self.client.start(self.settings.discord_bot_token)
         except discord.LoginFailure as e:
             self.logger.error("discord_login_failed", error=str(e))
             raise
@@ -96,9 +99,14 @@ class DiscordClient:
             self.logger.info("discord_disconnected")
 
     async def wait_until_ready(self, timeout: int = 30) -> None:
-        """Wait until the Discord client is ready."""
+        """Wait until the Discord client is ready and channel is available."""
         try:
+            # Wait for connection to start
+            await asyncio.wait_for(self._connect_started.wait(), timeout=timeout)
+            # Wait for Discord client to be ready
             await asyncio.wait_for(self.client.wait_until_ready(), timeout=timeout)
+            # Wait for channel to be set up
+            await asyncio.wait_for(self._channel_ready.wait(), timeout=timeout)
         except TimeoutError:
             self.logger.error("discord_ready_timeout", timeout=timeout)
             raise
@@ -224,8 +232,11 @@ class DiscordClient:
                 )
                 return existing_message_id
 
-            # Create new message
-            message = await self.channel.send(embed=embed)
+            # Create new message with optional prefix
+            if self.settings.message_prefix:
+                message = await self.channel.send(content=self.settings.message_prefix, embed=embed)
+            else:
+                message = await self.channel.send(embed=embed)
             self.event_message_map[event.id] = message.id
 
             # Also store URL mapping for future one-shot runs
