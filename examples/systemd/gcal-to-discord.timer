@@ -1,0 +1,37 @@
+[Unit]
+Description=Google Calendar to Discord Sync Timer
+Documentation=https://github.com/yourusername/gcal-to-discord
+Requires=gcal-to-discord.service
+
+[Timer]
+# Run 5 minutes after boot
+OnBootSec=5min
+
+# Run every 30 minutes
+OnUnitActiveSec=30min
+
+# Alternative schedules (comment/uncomment as needed):
+
+# Run every 15 minutes
+# OnUnitActiveSec=15min
+
+# Run hourly at minute 0
+# OnCalendar=hourly
+
+# Run at specific times (9 AM, 1 PM, 5 PM)
+# OnCalendar=09:00,13:00,17:00
+
+# Run every 30 minutes during business hours (8 AM - 6 PM)
+# OnCalendar=*-*-* 08,09,10,11,12,13,14,15,16,17,18:00,30:00
+
+# Run twice daily (8 AM and 5 PM)
+# OnCalendar=08:00,17:00
+
+# Accuracy (allow timer to drift this much for power saving)
+AccuracySec=1min
+
+# Run missed timers on startup
+Persistent=true
+
+[Install]
+WantedBy=timers.target

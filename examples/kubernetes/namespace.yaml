@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gcal-to-discord
+  labels:
+    app: gcal-to-discord
+    environment: production

@@ -1,0 +1,37 @@
+[Unit]
+Description=Google Calendar to Discord Sync (One-shot)
+Documentation=https://github.com/yourusername/gcal-to-discord
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=gcalsync
+Group=gcalsync
+WorkingDirectory=/opt/gcal-to-discord
+
+# Environment
+Environment="PATH=/opt/gcal-to-discord/.venv/bin:/usr/local/bin:/usr/bin:/bin"
+EnvironmentFile=/opt/gcal-to-discord/.env
+
+# Execute the sync
+ExecStart=/opt/gcal-to-discord/.venv/bin/python -m gcal_to_discord.main --once
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=gcal-to-discord
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/gcal-to-discord
+
+# Restart policy (for one-shot, only on failure)
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

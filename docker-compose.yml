@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  gcal-to-discord:
+    build: .
+    container_name: gcal-to-discord
+    restart: unless-stopped
+    volumes:
+      # Mount credentials and token files
+      - ./credentials.json:/app/credentials.json:ro
+      - ./token.json:/app/token.json
+    env_file:
+      - .env
+    environment:
+      - GOOGLE_CREDENTIALS_FILE=/app/credentials.json
+      - GOOGLE_TOKEN_FILE=/app/token.json
+    networks:
+      - gcal-discord-net
+
+networks:
+  gcal-discord-net:
+    driver: bridge

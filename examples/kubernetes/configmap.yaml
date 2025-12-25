@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gcal-to-discord-config
+  namespace: gcal-to-discord
+  labels:
+    app: gcal-to-discord
+data:
+  # Discord Configuration
+  DISCORD_CHANNEL_ID: "YOUR_DISCORD_CHANNEL_ID"
+
+  # Google Calendar Configuration
+  GOOGLE_CALENDAR_ID: "primary"
+  GOOGLE_CREDENTIALS_FILE: "/app/secrets/google/credentials.json"
+  GOOGLE_TOKEN_FILE: "/app/secrets/google/token.json"
+
+  # Sync Configuration (not used in CronJob mode, but required by app)
+  SYNC_INTERVAL_MINUTES: "30"
+  DAYS_AHEAD: "7"
+  EVENT_REMINDER_HOURS: "0"
+
+  # Logging Configuration
+  LOG_LEVEL: "INFO"
