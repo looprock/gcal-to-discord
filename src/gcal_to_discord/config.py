@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from pydantic import Field, validator
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -70,14 +70,16 @@ class Settings(BaseSettings):
         description="Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)",
     )
 
-    @validator("google_credentials_file", "google_token_file")
+    @field_validator("google_credentials_file", "google_token_file")
+    @classmethod
     def validate_path(cls, v: Path) -> Path:
         """Ensure path is absolute."""
         if not v.is_absolute():
             return Path.cwd() / v
         return v
 
-    @validator("log_level")
+    @field_validator("log_level")
+    @classmethod
     def validate_log_level(cls, v: str) -> str:
         """Validate log level."""
         valid_levels = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}

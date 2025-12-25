@@ -27,9 +27,25 @@ def discord_client(settings: Settings) -> DiscordClient:
 @pytest.mark.asyncio
 async def test_rebuild_event_mapping_empty_channel(discord_client: DiscordClient) -> None:
     """Test rebuilding event mapping with empty channel."""
-    # Mock channel with no messages
-    mock_channel = AsyncMock()
-    mock_channel.history.return_value.__aiter__.return_value = iter([])
+
+    # Mock channel with no messages - use same AsyncIterator pattern
+    class AsyncIterator:
+        def __init__(self, items):
+            self.items = items
+            self.index = 0
+
+        def __aiter__(self):
+            return self
+
+        async def __anext__(self):
+            if self.index >= len(self.items):
+                raise StopAsyncIteration
+            item = self.items[self.index]
+            self.index += 1
+            return item
+
+    mock_channel = Mock()
+    mock_channel.history.return_value = AsyncIterator([])
     discord_client.channel = mock_channel
     discord_client.client = Mock()
     discord_client.client.user = Mock()
@@ -57,11 +73,24 @@ async def test_rebuild_event_mapping_with_existing_messages(discord_client: Disc
     mock_message_2.embeds[0].url = "https://www.google.com/calendar/event?eid=event2"
     mock_message_2.id = 1002
 
-    # Mock channel with messages
-    mock_channel = AsyncMock()
-    mock_channel.history.return_value.__aiter__.return_value = iter(
-        [mock_message_1, mock_message_2]
-    )
+    # Mock channel with messages - history() must return an async iterator
+    class AsyncIterator:
+        def __init__(self, items):
+            self.items = items
+            self.index = 0
+
+        def __aiter__(self):
+            return self
+
+        async def __anext__(self):
+            if self.index >= len(self.items):
+                raise StopAsyncIteration
+            item = self.items[self.index]
+            self.index += 1
+            return item
+
+    mock_channel = Mock()
+    mock_channel.history.return_value = AsyncIterator([mock_message_1, mock_message_2])
     discord_client.channel = mock_channel
     discord_client.client = Mock()
     discord_client.client.user = Mock()

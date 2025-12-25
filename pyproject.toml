@@ -72,6 +72,10 @@ addopts = [
     "--cov-report=term-missing",
     "--cov-report=html",
 ]
+filterwarnings = [
+    "ignore::DeprecationWarning:httplib2.*",
+    "ignore::DeprecationWarning:discord.*",
+]
 
 [project.scripts]
 gcal-to-discord = "gcal_to_discord.main:main"
