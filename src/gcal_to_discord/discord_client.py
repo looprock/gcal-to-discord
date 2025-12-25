@@ -133,7 +133,7 @@ class DiscordClient:
                 message_count += 1
 
                 # Check if message has embeds and is from this bot
-                if message.author.id == self.client.user.id and message.embeds:
+                if self.client.user and message.author.id == self.client.user.id and message.embeds:
                     embed = message.embeds[0]
 
                     # Extract event URL from embed

@@ -89,4 +89,4 @@ class Settings(BaseSettings):
 
 def load_settings() -> Settings:
     """Load and validate application settings."""
-    return Settings()
+    return Settings()  # type: ignore[call-arg]

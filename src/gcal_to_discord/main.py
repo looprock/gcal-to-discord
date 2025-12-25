@@ -25,7 +25,7 @@ def configure_logging(log_level: str) -> None:
             structlog.dev.ConsoleRenderer(),
         ],
         wrapper_class=structlog.make_filtering_bound_logger(
-            getattr(structlog.stdlib, log_level.upper(), structlog.stdlib.INFO)
+            int(getattr(structlog.stdlib, log_level.upper(), 20))  # 20 = INFO level
         ),
         context_class=dict,
         logger_factory=structlog.PrintLoggerFactory(),
