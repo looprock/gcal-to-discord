@@ -20,4 +20,5 @@ RUN uv sync --frozen
 ENV PYTHONUNBUFFERED=1
 
 # Run the application
+# Note: Use --no-sync in Kubernetes/restricted environments to avoid permission issues
 CMD ["uv", "run", "gcal-to-discord"]

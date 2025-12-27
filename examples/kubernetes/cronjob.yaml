@@ -60,14 +60,45 @@ spec:
           # Service account (optional - for RBAC)
           # serviceAccountName: gcal-to-discord
 
+          # Init container to copy token to writable location
+          initContainers:
+            - name: init-token
+              image: gcal-to-discord:latest
+              command:
+                - sh
+                - -c
+                - |
+                  # Copy token from secret mount to writable location if it exists
+                  if [ -f /app/secrets/google/token.json ]; then
+                    cp /app/secrets/google/token.json /tmp/token.json
+                    echo "Token copied to /tmp/token.json"
+                  else
+                    echo "No existing token found, will be created on first OAuth flow"
+                  fi
+              volumeMounts:
+                - name: google-token
+                  mountPath: /app/secrets/google/token.json
+                  subPath: token.json
+                  readOnly: true
+                - name: tmp
+                  mountPath: /tmp
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: false
+                runAsNonRoot: true
+                runAsUser: 1000
+                capabilities:
+                  drop:
+                    - ALL
+
           containers:
             - name: sync
               # Replace with your image registry and tag
               image: gcal-to-discord:latest
               imagePullPolicy: IfNotPresent
 
-              # Run in one-shot mode
-              command: ["python", "-m", "gcal_to_discord.main", "--once"]
+              # Run in one-shot mode with uv (--no-sync since deps are pre-installed in image)
+              command: ["uv", "run", "--no-sync", "gcal-to-discord", "--once"]
 
               # Security context for container
               securityContext:
@@ -100,6 +131,9 @@ spec:
                     secretKeyRef:
                       name: gcal2discord-discord-bot-token
                       key: token
+                # UV cache directory (writable location for non-root user)
+                - name: UV_CACHE_DIR
+                  value: "/tmp/.uv-cache"
 
               # Volume mounts for credentials
               volumeMounts:
@@ -111,6 +145,8 @@ spec:
                   mountPath: /app/secrets/google/token.json
                   subPath: token.json
                   readOnly: true
+                - name: tmp
+                  mountPath: /tmp
 
           volumes:
             # Mount Google credentials.json from secret
@@ -129,6 +165,10 @@ spec:
                 items:
                   - key: token.json
                     path: token.json
+
+            # Shared writable tmp volume for token storage
+            - name: tmp
+              emptyDir: {}
 
           # Image pull secrets (if using private registry)
           # imagePullSecrets:

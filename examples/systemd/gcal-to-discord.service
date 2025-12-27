@@ -14,8 +14,9 @@ WorkingDirectory=/opt/gcal-to-discord
 Environment="PATH=/opt/gcal-to-discord/.venv/bin:/usr/local/bin:/usr/bin:/bin"
 EnvironmentFile=/opt/gcal-to-discord/.env
 
-# Execute the sync
-ExecStart=/opt/gcal-to-discord/.venv/bin/python -m gcal_to_discord.main --once
+# Execute the sync using uv
+# Note: Omit --no-sync to allow uv to manage dependencies in local installations
+ExecStart=/usr/local/bin/uv run gcal-to-discord --once
 
 # Logging
 StandardOutput=journal

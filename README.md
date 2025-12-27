@@ -380,6 +380,8 @@ kubectl get cronjob -n gcal-to-discord
 kubectl logs -l app=gcal-to-discord -n gcal-to-discord -f
 ```
 
+**Note**: The Kubernetes CronJob uses `uv run --no-sync` to skip dependency synchronization since dependencies are pre-installed in the Docker image. This prevents permission issues when running as a non-root user.
+
 See `examples/kubernetes/README.md` for full documentation.
 
 ### Docker Deployment

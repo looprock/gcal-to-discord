@@ -19,16 +19,10 @@ cd "${PROJECT_DIR}"
 # Log start time
 echo "[$(date -Iseconds)] Starting Google Calendar to Discord sync" >> "${LOG_FILE}"
 
-# Activate virtual environment and run sync
-if [ -f "${VENV_DIR}/bin/activate" ]; then
-    source "${VENV_DIR}/bin/activate"
-    python -m gcal_to_discord.main --once >> "${LOG_FILE}" 2>&1
-    EXIT_CODE=$?
-else
-    # Use UV to run directly
-    uv run gcal-to-discord --once >> "${LOG_FILE}" 2>&1
-    EXIT_CODE=$?
-fi
+# Run sync using uv (recommended approach)
+# Note: Omit --no-sync to allow uv to manage dependencies in local installations
+uv run gcal-to-discord --once >> "${LOG_FILE}" 2>&1
+EXIT_CODE=$?
 
 # Log completion
 if [ $EXIT_CODE -eq 0 ]; then

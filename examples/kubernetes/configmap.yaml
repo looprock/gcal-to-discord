@@ -13,7 +13,7 @@ data:
   # Google Calendar Configuration
   GOOGLE_CALENDAR_ID: "primary"
   GOOGLE_CREDENTIALS_FILE: "/app/secrets/google/credentials.json"
-  GOOGLE_TOKEN_FILE: "/app/secrets/google/token.json"
+  GOOGLE_TOKEN_FILE: "/tmp/token.json"
 
   # Sync Configuration (not used in CronJob mode, but required by app)
   SYNC_INTERVAL_MINUTES: "30"
